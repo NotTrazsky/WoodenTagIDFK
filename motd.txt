@@ -1,2 +1,8 @@
-slang:
-'YO' synonym for "hi" or sum
+**HELP COMMAND**
+
+prefix: ","
+
+commands:
+"help" - displays current text
+
+"ping" - sends "Pong"
