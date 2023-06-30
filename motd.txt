@@ -1,8 +1,89 @@
-**HELP COMMAND**
+SOURCE CODE (python):
 
-prefix: ","
+import discord
+from discord.ext import commands
+import dotenv
+from discord import app_commands
+import requests
 
-commands:
-"help" - displays current text
+intents = discord.Intents.all()
+prefix = ','
+token = dotenv.get_key(key_to_get='BOB', dotenv_path='C:\discordbot\.env')
 
-"ping" - sends "Pong"
+bot = commands.Bot(command_prefix=prefix, intents=intents)
+
+
+@bot.event
+async def on_ready():
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Cycy Code"),
+                              status=discord.Status.do_not_disturb)
+    print("Booting up your system")
+    print(bot.user.name + " Is Online!")
+    try:
+        synced = await bot.tree.sync()
+        print(f"Synced {len(synced)} command(s)")
+    except Exception as e:
+        print(e)
+
+
+@bot.tree.command()
+@app_commands.choices(age=[
+    discord.app_commands.Choice(name='13-14', value='13-14'),
+    discord.app_commands.Choice(name='15-16', value='15-16'),
+    discord.app_commands.Choice(name='17-18', value='17-18'),
+    discord.app_commands.Choice(name='18+', value='18+'),
+])
+async def introduce(interaction: discord.Interaction, name: str, age: str, description: str):
+    u = interaction.user
+    guild = interaction.guild
+    embed = discord.Embed(
+        title=f"{u}'s Introduction!",
+        description=f"Name: {name}\nAge: {age}\n\n Description: {description}",
+        color=discord.Color.brand_green(),
+    )
+    channel = guild.get_channel(1123271579028168834)
+    await channel.send(embed=embed)
+    await interaction.response.send_message("Sent!", ephemeral=True)
+
+@bot.tree.command()
+@app_commands.choices(color = [
+    discord.app_commands.Choice(name='Random', value='Random'),
+    discord.app_commands.Choice(name='Blue', value='Blue'),
+    discord.app_commands.Choice(name='Green', value='Green'),
+    discord.app_commands.Choice(name='Red', value='Red'),
+    discord.app_commands.Choice(name='Yellow', value='Yellow'),
+    discord.app_commands.Choice(name='Magenta', value='Magenta'),
+    discord.app_commands.Choice(name='OG Blurple', value='OG Blurple'),
+    discord.app_commands.Choice(name='New Blurple', value='New Blurple'),
+])
+async def embedcreate(interaction: discord.Interaction, title: str, description: str, color: str):
+    color_mapping = {
+        "Random": discord.Color.random(),
+        "Blue": discord.Color.blue(),
+        "Green": discord.Color.green(),
+        "Red": discord.Color.red(),
+        "Yellow": discord.Color.yellow(),
+        "Magenta": discord.Color.magenta(),
+        "OG Blurple": discord.Color.og_blurple(),
+        "New Blurple": discord.Color.blurple()
+        
+    }
+    
+    selected_color = color_mapping[color]
+    
+    e = discord.Embed(
+        title=title,
+        description=description,
+        color=selected_color,
+    )
+    
+    await interaction.response.send_message(embed=e)
+
+
+@bot.tree.command()
+async def getgithubrawcode(interaction: discord.Interaction):
+    r = requests.get(url='https://raw.githubusercontent.com/NotTrazsky/WoodenTagIDFK/main/motd.txt')
+    await interaction.response.send_message(r, ephemeral=True)
+
+
+bot.run(token)
